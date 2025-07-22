@@ -4,10 +4,10 @@ namespace SsmExporter.CLI.Models.Abstractions;
 
 public abstract class AppSettingsDocumentBase
 {
-    private readonly HashSet<string> _parameters = [];
+    protected HashSet<string> _parameters = [];
     public IEnumerable<string> Parameters => _parameters;
 
-    private readonly HashSet<string> _secrets = [];
+    protected HashSet<string> _secrets = [];
     public IEnumerable<string> Secrets => _secrets;
 
     protected static JsonDocument LoadDocument(string fileName)
