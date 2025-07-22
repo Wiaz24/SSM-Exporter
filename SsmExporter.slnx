@@ -2,5 +2,8 @@
   <Folder Name="/Solution items/">
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/Test/">
+    <Project Path="SsmExporter.Test.Unit\SsmExporter.Test.Unit.csproj" Type="Classic C#" />
+  </Folder>
   <Project Path="SsmExporter.CLI\SsmExporter.CLI.csproj" Type="Classic C#" />
 </Solution>
