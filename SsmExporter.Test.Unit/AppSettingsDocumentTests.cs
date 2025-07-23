@@ -156,6 +156,15 @@ public class AppSettingsDocumentTests
         // Assert
         exception.ShouldNotBeNull();
         exception.ShouldBeOfType<ParameterAlreadyDeclaredException>();
+        
+        if (File.Exists(appsettingsDevelopmentFileName))
+        {
+            File.Delete(appsettingsDevelopmentFileName);
+        }
+        if (File.Exists(appsettingsFileName))
+        {
+            File.Delete(appsettingsFileName);
+        }
     }
     
     [Fact]
