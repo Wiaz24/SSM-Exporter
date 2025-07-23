@@ -17,7 +17,7 @@ public class TerraformDocument
         _applicationName = applicationName;
         _appSettingsEnvDocuments = new List<AppSettingsEnvDocument>(appSettingsEnvDocuments);
     }
-    
+
     public void ExportTerraformFile(string outputDirectory)
     {
         if (string.IsNullOrWhiteSpace(outputDirectory))
@@ -29,6 +29,7 @@ public class TerraformDocument
         {
             Directory.CreateDirectory(outputDirectory);
         }
+
         var filePath = Path.Combine(outputDirectory, $"{_applicationName}.tf");
         var content = GetTerraformFileContent();
         File.WriteAllText(filePath, content);
@@ -42,7 +43,7 @@ public class TerraformDocument
             AddProviderSection();
             _terraformStringBuilder.AppendLine("");
         }
-        
+
         AddLocalsSection();
         _terraformStringBuilder.AppendLine("");
         foreach (var document in _appSettingsEnvDocuments)
@@ -50,18 +51,21 @@ public class TerraformDocument
             AddAwsSsmParameterSectionForDocument(document);
             _terraformStringBuilder.AppendLine("");
         }
+
         return _terraformStringBuilder.ToString();
     }
 
     private void AddLocalsSection()
     {
-        _terraformStringBuilder.AppendLine("locals = {");
+        _terraformStringBuilder.AppendLine("locals {");
         foreach (var document in AppSettingsEnvDocuments)
         {
             AddLocalsSectionForDocument(document);
         }
+
         _terraformStringBuilder.AppendLine("}");
     }
+
     private void AddLocalsSectionForDocument(AppSettingsEnvDocument document)
     {
         _terraformStringBuilder.AppendLine($"    {document.Environment.ToLower()}_parameters = {{");
@@ -69,19 +73,24 @@ public class TerraformDocument
         {
             _terraformStringBuilder.AppendLine($"        \"{parameter}\" = {{ type = \"String\", value = \"\"}}");
         }
+
         foreach (var secret in document.Secrets)
         {
             _terraformStringBuilder.AppendLine($"        \"{secret}\" = {{ type = \"SecureString\", value = \"\"}}");
         }
+
         _terraformStringBuilder.AppendLine("    }");
     }
 
     private void AddAwsSsmParameterSectionForDocument(AppSettingsEnvDocument document)
     {
-        _terraformStringBuilder.AppendLine($"resource \"aws_ssm_parameter\" \"{document.Environment.ToLower()}_params\" {{");
+        _terraformStringBuilder.AppendLine(
+            $"resource \"aws_ssm_parameter\" \"{document.Environment.ToLower()}_params\" {{");
         _terraformStringBuilder.AppendLine($"    for_each    = local.{document.Environment.ToLower()}_parameters");
-        _terraformStringBuilder.AppendLine($"    name        = \"/{_applicationName}/{document.Environment}${{each.key}}\"");
-        _terraformStringBuilder.AppendLine($"    description = \"{document.Environment} parameter for {_applicationName}\"");
+        _terraformStringBuilder.AppendLine(
+            $"    name        = \"/{_applicationName}/{document.Environment}${{each.key}}\"");
+        _terraformStringBuilder.AppendLine(
+            $"    description = \"{document.Environment} parameter for {_applicationName}\"");
         _terraformStringBuilder.AppendLine("    type        = each.value.type");
         _terraformStringBuilder.AppendLine("    value       = each.value.value");
         _terraformStringBuilder.AppendLine("    tier        = \"Standard\"");
@@ -93,7 +102,7 @@ public class TerraformDocument
         _terraformStringBuilder.AppendLine("    }");
         _terraformStringBuilder.AppendLine("}");
     }
-    
+
     private void AddProviderSection(string region = "eu-central-1", string profile = "default")
     {
         _terraformStringBuilder.AppendLine("provider \"aws\" {");

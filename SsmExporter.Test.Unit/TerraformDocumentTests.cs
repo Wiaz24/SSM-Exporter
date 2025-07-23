@@ -86,7 +86,7 @@ public class TerraformDocumentTests
                                                profile = "default"
                                            }
 
-                                           locals = {
+                                           locals {
                                                development_parameters = {
                                                    "/Services/ApiKey" = { type = "String", value = ""}
                                                    "/Services/ClientSecret" = { type = "SecureString", value = ""}
@@ -127,7 +127,7 @@ public class TerraformDocumentTests
     {
         // Arrange
         const string expectedFileContent = """
-                                           locals = {
+                                           locals {
                                                development_parameters = {
                                                    "/Services/ApiKey" = { type = "String", value = ""}
                                                    "/Services/ClientSecret" = { type = "SecureString", value = ""}
