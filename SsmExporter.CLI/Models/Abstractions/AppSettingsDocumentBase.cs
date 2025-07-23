@@ -1,4 +1,5 @@
 using System.Text.Json;
+using SsmExporter.CLI.Models.Exceptions;
 
 namespace SsmExporter.CLI.Models.Abstractions;
 
@@ -62,9 +63,17 @@ public abstract class AppSettingsDocumentBase
                 switch (value)
                 {
                     case "ssm-parameter":
+                        if (_secrets.Contains(currentPath))
+                        {
+                            throw new ParameterAlreadyDeclaredException(currentPath, "secret");
+                        }
                         _parameters.Add(currentPath);
                         break;
                     case "ssm-secret":
+                        if (_parameters.Contains(currentPath))
+                        {
+                            throw new ParameterAlreadyDeclaredException(currentPath, "parameter");
+                        }
                         _secrets.Add(currentPath);
                         break;
                 }

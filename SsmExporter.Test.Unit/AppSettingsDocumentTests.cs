@@ -1,5 +1,6 @@
 using Shouldly;
 using SsmExporter.CLI.Models;
+using SsmExporter.CLI.Models.Exceptions;
 
 namespace SsmExporter.Test.Unit;
 
@@ -120,5 +121,55 @@ public class AppSettingsDocumentTests
         {
             File.Delete(appsettingsFileName);
         }
+    }
+
+    [Fact]
+    public void
+        AppSettingsEnvDocumentCtor_WhenSecretAlreadyDeclaredAsParameter_ShouldThrowParameterAlreadyDeclaredException()
+    {
+        const string appsettingsJson = """
+                                       {
+                                           "Services": {
+                                               "ApiKey": "ssm-secret"
+                                           }
+                                       }
+                                       """;
+
+        const string appsettingsDevelopmentJson = """
+                                                  {
+                                                      "Services": {
+                                                          "ApiKey": "ssm-parameter"
+                                                      }
+                                                  }
+                                                  """;
+
+        var appsettingsFileName = Path.GetTempFileName();
+        File.WriteAllText(appsettingsFileName, appsettingsJson);
+
+        var appsettingsDevelopmentFileName = Path.GetTempFileName();
+        File.WriteAllText(appsettingsDevelopmentFileName, appsettingsDevelopmentJson);
+
+        // Act
+        var appSettings = new AppSettingsDocument(appsettingsFileName);
+        var exception = Record.Exception(() => new AppSettingsEnvDocument(appSettings, appsettingsDevelopmentFileName));
+        
+        // Assert
+        exception.ShouldNotBeNull();
+        exception.ShouldBeOfType<ParameterAlreadyDeclaredException>();
+    }
+    
+    [Fact]
+    public void AppSettingsDocumentCtor_WhenFileNotFound_ShouldThrowFileNotFoundException()
+    {
+        // Arrange
+        var nonExistentFileName = "nonexistent.json";
+
+        // Act
+        var exception = Record.Exception(() => new AppSettingsDocument(nonExistentFileName));
+
+        // Assert
+        exception.ShouldNotBeNull();
+        exception.ShouldBeOfType<FileNotFoundException>();
+        exception.Message.ShouldContain($"Configuration file not found: {nonExistentFileName}");
     }
 }
