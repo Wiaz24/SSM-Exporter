@@ -1,3 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using SsmExporter.CLI.Models;
 
-Console.WriteLine("Hello, World!");
+var cliInterface = new CliInterface();
+await cliInterface.RunAsync();

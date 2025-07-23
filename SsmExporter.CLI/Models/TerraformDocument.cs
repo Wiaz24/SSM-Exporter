@@ -7,7 +7,6 @@ public class TerraformDocument
     private readonly bool _addProvider;
     private readonly string _applicationName;
     private readonly List<AppSettingsEnvDocument> _appSettingsEnvDocuments;
-    public IEnumerable<AppSettingsEnvDocument> AppSettingsEnvDocuments => _appSettingsEnvDocuments;
     private readonly StringBuilder _terraformStringBuilder = new();
 
     public TerraformDocument(IEnumerable<AppSettingsEnvDocument> appSettingsEnvDocuments, string applicationName,
@@ -58,7 +57,7 @@ public class TerraformDocument
     private void AddLocalsSection()
     {
         _terraformStringBuilder.AppendLine("locals {");
-        foreach (var document in AppSettingsEnvDocuments)
+        foreach (var document in _appSettingsEnvDocuments)
         {
             AddLocalsSectionForDocument(document);
         }
